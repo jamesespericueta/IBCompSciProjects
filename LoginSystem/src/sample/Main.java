@@ -31,7 +31,9 @@ public class Main extends Application {
 
         VBox loginCenter = new VBox();
         VBox signupCenter = new VBox();
+        VBox homeCenter = new VBox();
         loginCenter.setAlignment(Pos.CENTER);
+        homeCenter.setAlignment(Pos.CENTER);
 
         TextField usernameTF = new TextField();
         usernameTF.setPromptText("Enter Username");
@@ -54,9 +56,13 @@ public class Main extends Application {
 
         Label matching = new Label();
         Label retry = new Label();
+        Label welcome  = new Label("Welcome");
+        welcome.setAlignment(Pos.CENTER);
 
         loginCenter.getChildren().addAll(usernameTF, passwordTF, loginButton, signupButton);
         signupCenter.getChildren().addAll(suLastNameTF,suUsernameTF,suPasswordTF,suPasswordConfirmTF, matching, suRegister,retry);
+        homeCenter.getChildren().add(welcome);
+
 
         signupButton.setOnAction( event ->  primaryStage.setScene(signupScene) );
 
@@ -76,14 +82,23 @@ public class Main extends Application {
                 }
             }
         } );
+        suPasswordTF.textProperty().addListener( (obs, past, currentText) ->
+        {
+            if (suPasswordConfirmTF.getText().equals(""))
+            {
+                matching.setText("");
+            }
+            else
+            {
+                matching.setText( (suPasswordConfirmTF.getText().equals(suPasswordTF.getText()))? "Passwords Match" : "Passwords Do Not Match");
+            }
+        });
 
         suRegister.setOnAction( event -> {
             boolean userExists = false;
             Accounts tempAccount = new Accounts(suUsernameTF.getText(), suPasswordTF.getText(), suLastNameTF.getText());
             for(Accounts account : accounts)
             {
-                System.out.println(account.equals(tempAccount));
-                System.out.println(tempAccount.toString());
                 if(account.equals(new Accounts(suUsernameTF.getText(), suPasswordTF.getText(), suLastNameTF.getText())))
                 {
                     retry.setText("This account already exists");
@@ -95,11 +110,16 @@ public class Main extends Application {
             if(matching.getText().equals("Passwords Match") && !userExists)
             {
                 accounts.add(new Accounts(suUsernameTF.getText(), suPasswordTF.getText(), suLastNameTF.getText()));
-                System.out.println("working" + userExists + accounts.toString());
+                suLastNameTF.setText("");
+                suUsernameTF.setText("");
+                suPasswordTF.setText("");
+                suPasswordConfirmTF.setText("");
 
+                primaryStage.setScene(loginScene);
             }
         });
 
+        homePage.setCenter(homeCenter);
         signupScreen.setCenter(signupCenter);
         login.setCenter(loginCenter);
         primaryStage.setTitle("Login System 2");
